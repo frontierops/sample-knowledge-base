@@ -92,7 +92,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Evaluate retrieval against Qdrant.")
     ap.add_argument("--k", type=int, default=5)
     ap.add_argument("--collection",
-                    default=os.environ.get("QDRANT_COLLECTION", ingest.DEFAULT_COLLECTION))
+                    default=os.environ.get("QDRANT_COLLECTION") or ingest.DEFAULT_COLLECTION)
     ap.add_argument("--show-all", action="store_true",
                     help="print every query result, not just misses")
     args = ap.parse_args(argv)

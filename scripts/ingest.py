@@ -239,7 +239,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Embed the knowledge base into Qdrant.")
     ap.add_argument("--root", default=".", help="repo root containing the content folders")
     ap.add_argument("--collection",
-                    default=os.environ.get("QDRANT_COLLECTION", DEFAULT_COLLECTION))
+                    default=os.environ.get("QDRANT_COLLECTION") or DEFAULT_COLLECTION)
     ap.add_argument("--dry-run", action="store_true",
                     help="parse + chunk only; no embedding or network")
     ap.add_argument("--recreate", action="store_true",

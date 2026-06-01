@@ -76,18 +76,29 @@ fine) cluster, and copy its **URL** and an **API key**.
 Create a key at [platform.openai.com/api-keys](https://platform.openai.com/api-keys).
 Embedding this corpus costs a fraction of a cent per run.
 
-### 3. Add GitHub repository secrets
+### 3. Add GitHub Actions secrets and variables
 
-Repo → **Settings → Secrets and variables → Actions → New repository secret**:
+Repo → **Settings → Secrets and variables → Actions**. The workflow reads the API
+keys from **Secrets** (encrypted) and the non-sensitive config from **Variables**:
+
+**Secrets** tab → *New repository secret*:
 
 | Secret | Value |
 | --- | --- |
 | `OPENAI_API_KEY` | your OpenAI API key (`sk-...`) |
-| `QDRANT_URL` | your cluster URL, e.g. `https://xxxx.cloud.qdrant.io:6333` |
 | `QDRANT_API_KEY` | your Qdrant API key |
 
-The collection name defaults to `starwars_kb` (set in the workflow as
-`QDRANT_COLLECTION`).
+**Variables** tab → *New repository variable*:
+
+| Variable | Value |
+| --- | --- |
+| `QDRANT_URL` | your cluster URL, e.g. `https://xxxx.cloud.qdrant.io` |
+| `QDRANT_COLLECTION` | collection name, e.g. `starwars_kb` (falls back to `starwars_kb` if unset) |
+
+> Putting the keys in Secrets and the URL/collection in Variables is the
+> recommended split — Variables are meant for non-sensitive data. If you keep the
+> URL in Secrets instead, change `vars.QDRANT_URL` back to `secrets.QDRANT_URL` in
+> the workflow.
 
 ### 4. Run it
 

@@ -28,7 +28,7 @@ def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="Search the Qdrant knowledge base.")
     ap.add_argument("query", help="natural-language query")
     ap.add_argument("--collection",
-                    default=os.environ.get("QDRANT_COLLECTION", DEFAULT_COLLECTION))
+                    default=os.environ.get("QDRANT_COLLECTION") or DEFAULT_COLLECTION)
     ap.add_argument("--limit", type=int, default=5)
     ap.add_argument("--category", help="restrict to a category (payload filter)")
     ap.add_argument("--era", help="restrict to an era (payload filter)")
