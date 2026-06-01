@@ -1,0 +1,54 @@
+name: Ingest knowledge base into Qdrant
+
+# Embeds the Star Wars knowledge base with OpenAI (text-embedding-3-large) and
+# upserts it into a Qdrant Cloud collection. Runs when content (or the pipeline)
+# changes, and on manual dispatch. The ingest script is idempotent, so re-runs
+# are safe.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "characters/**"
+      - "planets/**"
+      - "factions/**"
+      - "technology/**"
+      - "events/**"
+      - "species/**"
+      - "concepts/**"
+      - "scripts/ingest.py"
+      - "requirements.txt"
+      - ".github/workflows/ingest-qdrant.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: qdrant-ingest
+  cancel-in-progress: false
+
+jobs:
+  ingest:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run pure-logic tests
+        run: python scripts/test_ingest.py
+
+      - name: Embed and upsert into Qdrant
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          QDRANT_URL: ${{ secrets.QDRANT_URL }}
+          QDRANT_API_KEY: ${{ secrets.QDRANT_API_KEY }}
+          QDRANT_COLLECTION: starwars_kb
+        run: python scripts/ingest.py

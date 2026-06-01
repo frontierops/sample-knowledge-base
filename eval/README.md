@@ -18,6 +18,20 @@ one document, each listed document independently contains material that supports
 retriever should surface at least one, and ideally all, of them. This makes the set usable for both
 lenient (hit@k) and strict (full-set recall) scoring.
 
+## Running it
+
+`scripts/eval.py` runs this set against a populated Qdrant collection and reports
+the metrics below. Ingest the knowledge base first (`scripts/ingest.py`), then:
+
+```bash
+python scripts/eval.py            # k=5 (default)
+python scripts/eval.py --k 3      # stricter
+python scripts/eval.py --show-all # print every query, not just misses
+```
+
+It scores at **document** granularity: retrieved chunks are collapsed to a ranked
+list of unique documents, which is then compared against `expected_docs`.
+
 ## Suggested metrics
 
 - **Recall@k** — fraction of `expected_docs` appearing in the top *k* retrieved chunks/documents.

@@ -1,0 +1,12 @@
+# Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
+# Local Qdrant on-disk storage / model caches
+qdrant_storage/
+.fastembed/
+
+# Env files (never commit API keys)
+.env

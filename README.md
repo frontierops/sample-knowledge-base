@@ -69,3 +69,55 @@ from more than one document on purpose — for example, the Battle of Yavin appe
 
 `expected_docs` lists the document(s) a correct retriever should surface. See
 `eval/README.md` for scoring notes.
+
+## Searching this knowledge base (Qdrant pipeline)
+
+This repo includes a pipeline that embeds the content and loads it into a
+[Qdrant](https://qdrant.tech/) vector database so it can be searched. Embeddings
+are created with OpenAI's `text-embedding-3-large` model. A GitHub Action runs it
+automatically on push; you can also run it locally. Full details are in
+[`docs/pipeline.md`](docs/pipeline.md).
+
+### Install
+
+Use a virtual environment (recommended on macOS — avoids the system-Python
+"externally-managed-environment" error):
+
+```bash
+cd sample-knowledge-base
+python3 -m venv .venv
+source .venv/bin/activate          # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+```
+
+### Run locally
+
+**No keys needed — just check parsing/chunking:**
+
+```bash
+python scripts/ingest.py --dry-run   # parse + chunk only, no embedding/network
+python scripts/test_ingest.py        # unit tests
+```
+
+**Fully local end-to-end — only an OpenAI key + Docker** (no Qdrant Cloud account):
+
+```bash
+docker run -p 6333:6333 qdrant/qdrant        # start a local Qdrant
+export OPENAI_API_KEY="sk-..."
+export QDRANT_URL="http://localhost:6333"    # no QDRANT_API_KEY needed locally
+python scripts/ingest.py                     # embed + upsert
+python scripts/search.py "who destroyed the Death Star?"
+python scripts/search.py --category planets "ice world rebel base"
+```
+
+**Against Qdrant Cloud** — add the cluster URL and key:
+
+```bash
+export OPENAI_API_KEY="sk-..."
+export QDRANT_URL="https://xxxx.cloud.qdrant.io:6333"
+export QDRANT_API_KEY="..."
+python scripts/ingest.py && python scripts/search.py "who manipulated both sides of the Clone Wars?"
+```
+
+The ingest is idempotent — re-running updates changed chunks and removes deleted
+ones, so it's safe to run repeatedly while you test.
